@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="url">
+		http://list.taobao.com/itemlist/bao.htm
+	</var-def>
+	<var-def name="contens">
+		<taobao dir="output/taobao/" writeHeader="true" delimiter="," charset="UTF-8">
+		    <http method="post" url="${url}">
+		    	<http-param name="_input_charset">utf-8</http-param>
+		    	<http-param name="json">on</http-param>
+		    	<http-param name="cat">50072766</http-param>
+		    	<http-param name="data-key">s</http-param>
+		    	<http-param name="data-value">1290</http-param>
+		    	<http-param name="module">page</http-param>
+		    	<http-param name="_ksTS">382875383534_429</http-param>
+		    </http>
+		</taobao>
+	</var-def>
+	<!--
+	<loop item="itemLst" index="i" filter="unique">
+	    <list>
+	    	<xpath expression="//array">
+	        	<var name="contens"/>
+	       	</xpath>
+	    </list>
+	    <body>
+	    	<var-def name="fileName">
+	    		<xpath expression="data(//itemId)">
+	    			<var name="itemLst"/>
+		       	</xpath>
+	    	</var-def>
+	        <file action="write" path="output/taobao/${fileName}.xml" charset="UTF-8">
+		        <var name="itemLst"/>
+			</file>
+	    </body>
+	</loop>
+	-->
+</config>

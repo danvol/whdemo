@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+   <function name="xml-to-csv">
+      <!-- Get the XML content from the XML file.  Tidy if instructed to do so. -->
+      <case>
+         <if condition="${tidy_xml}">
+            <var-def name="xml_content">
+               <html-to-xml>
+                  <file action="read" path="${xml_file}" charset="UTF-8" />
+               </html-to-xml>
+            </var-def>
+         </if>
+         <else>
+            <var-def name="xml_content">
+               <file action="read" path="${xml_file}" charset="UTF-8" />
+            </var-def>
+         </else>
+      </case>
+      <!-- Query distinct column names. Change '//val@id' below to the XPath which defines each column name. -->
+      <var-def name="column_names">
+         <xpath expression="${xpath_get_column_names}">
+            <var name="xml_content" />
+         </xpath>
+      </var-def>
+      <!-- Write the headers to a new file. Change charset if needed. -->
+      <var-def name="first_record">true</var-def>
+      <file action="write" path="${data_file_name}" charset="UTF-8">
+         <loop item="column_name" index="col">
+            <list>
+               <var name="column_names" />
+            </list>
+            <body>
+               <case>
+                  <if condition="${first_record}">
+                     <empty>
+                        <var-def name="first_record">false</var-def>
+                     </empty>
+                     <template>${qualifier}${column_name}${qualifier}</template>
+                  </if>
+                  <else>
+                     <template>${delimiter}${qualifier}${column_name}${qualifier}</template>
+                  </else>
+               </case>
+            </body>
+         </loop>
+      </file>
+      <empty>
+         <var-def name="records">
+            <xpath expression="${xpath_get_records}">
+               <var name="xml_content" />
+            </xpath>
+         </var-def>
+      </empty>
+      <!-- Loop thru each record. -->
+      <loop item="record" index="i" filter="${filter}">
+         <list>
+            <var name="records" />
+         </list>
+         <body>
+            <!-- Append each data row onto the file. -->
+            <file action="append" path="${data_file_name}" charset="UTF-8">
+               <!-- Start new data row. -->
+               <template>${const.lf}</template>
+               <!-- Add each column's value to the CSV row. -->
+               <empty>
+                  <var-def name="first_column">true</var-def>
+               </empty>
+               <loop item="column_name" index="c">
+                  <list>
+                     <var name="column_names" />
+                  </list>
+                  <body>
+                     <empty>
+                        <var-def name="this_val">
+                           <empty>
+                              <var-def name="this_xpath">
+                                 <regexp replace="true">
+                                    <regexp-pattern>
+                                       <template>\{column_name\}</template>
+                                    </regexp-pattern>
+                                    <regexp-source>
+                                       <template>${xpath_get_column_value}</template>
+                                    </regexp-source>
+                                    <regexp-result>
+                                       <template>${column_name}</template>
+                                    </regexp-result>
+                                 </regexp>
+                              </var-def>
+                           </empty>
+                           <xpath expression="${this_xpath}">
+                              <var name="record" />
+                           </xpath>
+                        </var-def>
+                        <!-- Escape any qualifier characters which appear in the text. -->
+                        <case>
+                           <if condition="${escape_qualifier == null}">
+                              <var-def name="escaped_val">
+                                 <var name="this_val" />
+                              </var-def>
+                           </if>
+                           <else>
+                              <var-def name="escaped_val">
+                                 <regexp replace="true">
+                                    <regexp-pattern>
+                                       <template>${qualifier}</template>
+                                    </regexp-pattern>
+                                    <regexp-source>
+                                       <template>${this_val}</template>
+                                    </regexp-source>
+                                    <regexp-result>
+                                       <template>${escape_qualifier}</template>
+                                    </regexp-result>
+                                 </regexp>
+                              </var-def>
+                           </else>
+                        </case>
+                     </empty>
+                     <case>
+                        <if condition="${first_column}">
+                           <empty>
+                              <var-def name="first_column">false</var-def>
+                           </empty>
+                           <template>${qualifier}${escaped_val}${qualifier}</template>
+                        </if>
+                        <else>
+                           <template>${delimiter}${qualifier}${escaped_val}${qualifier}</template>
+                        </else>
+                     </case>
+                  </body>
+               </loop>
+            </file>
+         </body>
+      </loop>
+   </function>
+</config>
