@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="weblio">
+		<html-to-xml>
+			<http method="post" url="http://cjjc.weblio.jp/content/%E5%90%88%E7%9D%80">
+		    </http>
+		</html-to-xml>
+	</var-def>
+	
+	<!--EDR日中対訳辞書 -->
+	<xpath expression="//div[@class='Edrct']/p/text()">
+		<var name="weblio"></var>
+	</xpath>
+	<xpath expression="//div[@class='Edrct']/p">
+		<var name="weblio"></var>
+	</xpath>
+	<xpath expression="//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'読み方')]/../text()">
+		<var name="weblio"></var>
+	</xpath>
+	<xpath expression="//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text()">
+		<var name="weblio"></var>
+	</xpath>
+	
+	<!--日中中日専門用語辞典 -->
+	<xpath expression="//div[@class='Ncsmy']/span[@class='ncsmyC']/a[@title='読み方']/..[1]/..[1]/text()/normalize-space()">
+		<var name="weblio"></var>
+	</xpath>
+	<xpath expression="//div[@class='Ncsmy']/span[text()='中国語訳']/following-sibling::node()/@title">
+		<var name="weblio"></var>
+	</xpath>
+	<xpath expression="//div[@class='Ncsmy']">
+		<var name="weblio"></var>
+	</xpath>
+
+</config>
