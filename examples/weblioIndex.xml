@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="weblio">
+		<html-to-xml>
+			<http method="post" url="http://cjjc.weblio.jp/category/aa">
+		    </http>
+		</html-to-xml>
+	</var-def>
+	<loop item="url" index="i">
+		<list>
+			<xpath expression="//span[@class='kanaAlphaC']/a/@href">
+				<var name="weblio"></var>
+			</xpath>
+		</list>
+		<body>
+			<var-def name="page">
+				<html-to-xml>
+					<http method="post" url="${url}">
+				    </http>
+				</html-to-xml>
+			</var-def>
+			<!--白水社 中国語辞典-->
+			<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text()">
+				<var name="page"></var>
+			</xpath>
+			<!--EDR日中対訳辞書-->
+			<xpath expression="//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'読み方')]/../text()">
+				<var name="page"></var>
+			</xpath>
+			<xpath expression="//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text()">
+				<var name="page"></var>
+			</xpath>
+			
+			<!--日中中日専門用語辞典-->
+			<xpath expression="//div[@class='Ncsmy']/span[@class='ncsmyC']/a[@title='読み方']/..[1]/..[1]/text()/normalize-space()">
+				<var name="page"></var>
+			</xpath>
+			<xpath expression="//div[@class='Ncsmy']/span[text()='中国語訳']/following-sibling::node()/@title">
+				<var name="page"></var>
+			</xpath>
+		</body>
+	</loop>
+</config>

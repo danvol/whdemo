@@ -117,18 +117,21 @@ public class ScraperConfiguration {
      * 
      * @param sourceFile
      * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException 
      */
-    public ScraperConfiguration(File sourceFile) throws FileNotFoundException {
+    public ScraperConfiguration(File sourceFile) throws FileNotFoundException, UnsupportedEncodingException {
         this.sourceFile = sourceFile;
-        createFromInputStream( new InputSource(new FileReader(sourceFile)) );
+        createFromInputStream( new InputSource(new InputStreamReader(new FileInputStream(sourceFile), "UTF-8")) );
+//        createFromInputStream( new InputSource(new FileReader(sourceFile)) );
     }
 
     /**
      * Creates configuration instance loaded from the file specified by filename.
      * 
      * @param sourceFilePath
+     * @throws UnsupportedEncodingException 
      */
-    public ScraperConfiguration(String sourceFilePath) throws FileNotFoundException {
+    public ScraperConfiguration(String sourceFilePath) throws FileNotFoundException, UnsupportedEncodingException {
         this( new File(sourceFilePath) );
     }
 
