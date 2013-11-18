@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="products">
+		<google-tran>
+			<http method="post" url="http://translate.google.co.jp/translate_a/t">
+		        <http-param name="client">t</http-param>
+		        <http-param name="sl">ja</http-param>
+		        <http-param name="tl">zh-CN</http-param>
+		        <http-param name="hl">ja</http-param>
+		        <http-param name="sc">2</http-param>
+		        <http-param name="ie">UTF-8</http-param>
+		        <http-param name="oe">UTF-8</http-param>
+		        <http-param name="oc">1</http-param>
+		        <http-param name="psl">ja</http-param>
+		        <http-param name="ptl">en</http-param>
+		        <http-param name="otf">1</http-param>
+		        <http-param name="it">sel.14254</http-param>
+		        <http-param name="ssel">0</http-param>
+		        <http-param name="tsel">3</http-param>
+		        <http-param name="q"><template>${sys.getUrlEncode("システム")}</template></http-param>
+		    </http>
+    	</google-tran>
+    </var-def>
+</config>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <function name="download-multipage-list">
+        <return>
+            <while condition="${pageUrl.toString().length() != 0}" maxloops="${maxloops}" index="i">
+                <empty>
+                    <var-def name="content">
+                        <html-to-xml>
+                            <http url="${pageUrl}"/>
+                        </html-to-xml>
+                    </var-def>
+
+                    <var-def name="nextLinkUrl">
+                        <xpath expression="${nextXPath}">
+                            <var name="content"/>
+                        </xpath>
+                    </var-def>
+
+                    <var-def name="pageUrl">
+                        <template>${nextLinkUrl}</template>
+                    </var-def>
+                </empty>
+    
+                <xpath expression="${itemXPath}">
+                    <var name="content"/>
+                </xpath>
+            </while>
+        </return>
+    </function>
+
+	<var-def name="startUrl">http://cjjc.weblio.jp/category/aa</var-def>
+    
+	<var-def name="content">
+		<xpath expression="//span[@class='kanaAlphaC']/a/@href">
+			<html-to-xml>
+				<http method="post" url="${startUrl}" />
+			</html-to-xml>
+        </xpath>
+    </var-def>
+    
+	<loop item="aiueoUrl" index="m">
+		<list>
+			<var name="content"></var>
+		</list>
+		<body>
+		    <var-def name="indexUrls">    
+		        <call name="download-multipage-list">
+		            <call-param name="pageUrl"><template>${aiueoUrl}</template></call-param>
+		            <call-param name="nextXPath">(//a[starts-with(., '次へ＞')]/@href)[1]</call-param>
+		            <call-param name="itemXPath">//ul[@class="CtgryUlL" or @class="CtgryUlR"]/li/a/@href</call-param>
+		            <call-param name="maxloops">1</call-param>
+		        </call>
+		    </var-def>
+	    	<csv dir="output/weibo/" writeheader="true" delimiter="," charset="UTF-8" filename="weibo_${m}.csv">
+				<loop item="url" index="i">
+					<list>
+						<var name="indexUrls"></var>
+					</list>
+					<body>
+						<empty>
+							<var-def name="page">
+								<html-to-xml>
+									<http method="post" url="${url}">
+								    </http>
+								</html-to-xml>
+							</var-def>
+						</empty>
+					    <template>
+					        <![CDATA[]]>
+					                <xquery>
+					                    <xq-param name="page" type="node()"><var name="page"/></xq-param>
+					                    <xq-param name="url" type="string"><var name="url"/></xq-param>
+					                    <xq-expression><![CDATA[
+					                            declare variable $page as node() external;
+					                            declare variable $url as xs:string external;
+					 
+					                            let $Cgkgj_zh_cn := data($page//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
+					                            let $Edrct_zh_cn := data($page//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
+					                            let $Ncsmy_zh_cn := data($page//div[@class='Ncsmy']/span[text()='中国語訳']/following-sibling::node()/@title)
+					                            let $midashigo := data(($page//h2[@class='midashigo']/@title)[1])
+					                            let $query := data($page//input[@id='combo_txt']/@value)
+					                                return
+					                                    <result>
+					                                    	<word>{$query}</word>
+					                                    	<spell>{$midashigo}</spell>
+					                                    	<Cgkgj_zh_cn>{$Cgkgj_zh_cn}</Cgkgj_zh_cn>
+					                                    	<Edrct_zh_cn>{$Edrct_zh_cn}</Edrct_zh_cn>
+					                                    	<Ncsmy_zh_cn>{$Ncsmy_zh_cn}</Ncsmy_zh_cn>
+					                                    	<url>{$url}</url>
+					                                    </result>
+					                    ]]></xq-expression>
+					                </xquery>
+					        <![CDATA[]]>
+					    </template>
+					</body>
+				</loop>
+			</csv>
+		</body>
+	</loop>
+
+</config>
