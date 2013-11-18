@@ -36,24 +36,60 @@
 */
 package org.webharvest.utils;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.stream.StreamResult;
+
 import net.sf.saxon.om.Item;
 import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.query.QueryResult;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.type.Type;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.XML;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.webharvest.definition.XmlNode;
+import org.webharvest.definition.XmlParser;
+import org.webharvest.exception.FileException;
 import org.webharvest.exception.VariableException;
 import org.webharvest.runtime.variables.EmptyVariable;
-import org.webharvest.runtime.variables.Variable;
 import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.net.URL;
-import java.util.*;
+import org.webharvest.runtime.variables.Variable;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Basic evaluation utilities
@@ -718,5 +754,80 @@ public class CommonUtil {
         }
         return -1;
     }
-
+    
+    private final static String XML_TO_CSV_MAP_HEADER_KEY = "header";
+    private final static String XML_TO_CSV_MAP_LINES_KEY = "lines";
+    public static void resultXmlToCsv(String xmlBody, boolean isWriteHeader, String dir, String fileName, String charset, String delimiter) {
+        final String newLine = System.getProperty("line.separator");
+        try {
+        	XmlNode xmlNode = XmlParser.parse(new InputSource(new ByteArrayInputStream(xmlBody.getBytes(charset))));
+        	Map<String, List<String>> resultMap = getXmlDataList(xmlNode, delimiter);
+            // CSVÇ÷èoóÕ
+            writeCsv(fileName, dir + fileName, charset, newLine
+            		, StringUtils.join(resultMap.get(XML_TO_CSV_MAP_HEADER_KEY).toArray(), delimiter), resultMap.get(XML_TO_CSV_MAP_LINES_KEY));
+        } catch (Exception e) {
+            throw new FileException("Error converting XML to CSV: " + e.getMessage());
+        }
+    }
+    
+    public static Map<String, List<String>> getXmlDataList(XmlNode xmlNode, String delimiter) {
+    	List<String> headerNames = new ArrayList<String>();
+    	List<String> lineValues = new ArrayList<String>();
+    	List<String> lines = new ArrayList<String>();
+    	Map<String, List<String>> resultMap = new HashMap<String, List<String>>();
+    	Iterator<XmlNode> it = xmlNode.getElementList().iterator();
+    	while (it.hasNext()) {
+    		XmlNode n = it.next();
+    		if (n.isEmpty()) {
+    			String header = StringEscapeUtils.escapeCsv(n.getName());
+    			headerNames.add(header);
+    			lineValues.add(StringEscapeUtils.escapeCsv(n.getText()));
+    		}else{
+    			Map<String, List<String>> tmpMap = getXmlDataList(n, delimiter);
+    			if (resultMap.get(XML_TO_CSV_MAP_HEADER_KEY)==null){
+    				resultMap = tmpMap;
+    			}else{
+    				resultMap.get(XML_TO_CSV_MAP_LINES_KEY).addAll(tmpMap.get(XML_TO_CSV_MAP_LINES_KEY));
+    			}
+    		}
+    	}
+    	if (!headerNames.isEmpty()) {
+    		resultMap.put(XML_TO_CSV_MAP_HEADER_KEY, headerNames);
+    	}
+    	if (!lineValues.isEmpty()) {
+    		lines.add(StringUtils.join(lineValues.toArray(), delimiter));
+    		resultMap.put(XML_TO_CSV_MAP_LINES_KEY, lines);
+    	}
+    	return resultMap;
+    }
+    
+    public static void writeCsv(String fileName, String fullPath, String charset
+			, String newLine, List<String> lines) {
+    	writeCsv(fileName, fullPath, charset, newLine, null, lines);
+	}
+    
+    public static void writeCsv(String fileName, String fullPath, String charset
+			, String newLine, String headerNames, List<String> lines) {
+    	try {
+    		// ensure that target directory exists
+    		new File( CommonUtil.getDirectoryFromPath(fullPath) ).mkdirs();
+    		
+    		FileOutputStream out = new FileOutputStream(fullPath, false);
+    		byte[] data;
+    		
+    		StringBuilder content = new StringBuilder();
+    		if (StringUtils.isNotEmpty(headerNames)) content.append(headerNames).append(newLine);
+    		for (String line : lines) {
+    			content.append(line).append(newLine);
+    		}
+    		
+    		data = content.toString().getBytes(charset);
+    		
+    		out.write(data);
+    		out.flush();
+    		out.close();
+    	} catch (IOException e) {
+    		throw new FileException("Error writing data to file: " + fullPath, e);
+    	}
+	}
 }

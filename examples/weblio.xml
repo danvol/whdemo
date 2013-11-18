@@ -12,10 +12,38 @@
 	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text()">
 		<var name="weblio"></var>
 	</xpath>
-	<!--
 	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'解説')]/following-sibling::node()/text()">
 		<var name="weblio"></var>
 	</xpath>
+	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'解説')]/following-sibling::node()/../text()">
+		<var name="weblio"></var>
+	</xpath>
+    <template>
+	    <![CDATA[]]>
+	            <xquery>
+	                <xq-param name="page" type="node()"><var name="weblio"/></xq-param>
+	                <xq-expression><![CDATA[
+	                        declare variable $page as node() external;
+	
+	                        let $Cgkgj_zh_cn := data($page//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
+	                        let $Edrct_zh_cn := data($page//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
+	                        let $Ncsmy_zh_cn := data($page//div[@class='Ncsmy']/span[text()='中国語訳']/following-sibling::node()/@title)
+	                        let $midashigo := data(($page//h2[@class='midashigo']/@title)[1])
+	                        let $query := data($page//input[@id='combo_txt']/@value)
+	                            return
+	                                <result>
+	                                	<word>{$query}</word>
+	                                	<spell>{$midashigo}</spell>
+	                                	<Cgkgj_zh_cn>{$Cgkgj_zh_cn}</Cgkgj_zh_cn>
+	                                	<Edrct_zh_cn>{$Edrct_zh_cn}</Edrct_zh_cn>
+	                                	<Ncsmy_zh_cn>{$Ncsmy_zh_cn}</Ncsmy_zh_cn>
+	                                	<url>{$url}</url>
+	                                </result>
+	                ]]></xq-expression>
+	            </xquery>
+	    <![CDATA[]]>
+	</template>
+	<!--
 	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'解説')]/following-sibling::node()/..[1]/text()">
 		<var name="weblio"></var>
 	</xpath>

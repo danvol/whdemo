@@ -31,13 +31,14 @@
 
     <var-def name="indexUrls">    
         <call name="download-multipage-list">
-            <call-param name="pageUrl">http://cjjc.weblio.jp/category/aa</call-param>
+            <call-param name="pageUrl">http://cjjc.weblio.jp/category/be-bo</call-param>
             <call-param name="nextXPath">(//a[starts-with(., '次へ＞')]/@href)[1]</call-param>
             <call-param name="itemXPath">//ul[@class="CtgryUlL" or @class="CtgryUlR"]/li/a/@href</call-param>
             <call-param name="maxloops">1</call-param>
         </call>
     </var-def>
 
+<csv>
 	<loop item="url" index="i">
 		<list>
 			<var name="indexUrls"></var>
@@ -77,5 +78,5 @@
 		    </file>
 		</body>
 	</loop>
-
+</csv>
 </config>

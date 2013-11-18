@@ -44,6 +44,9 @@ import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
 import org.webharvest.runtime.processors.CallProcessor;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -197,6 +200,24 @@ public class SystemUtilities {
     public String getFilename(String path) {
         int index = Math.max( path.lastIndexOf("\\"), path.lastIndexOf("/") );
         return index >= 0 && index < path.length() - 1 ? path.substring(index + 1) : path;
+    }
+    
+    public String getUrlEncode(String input) {
+    	String output = "";
+    	try {
+    		output = URLEncoder.encode(input, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+    	return output;
+    }
+    
+    public String getUrldecode(String input) {
+    	String output = "";
+    	try {
+    		output = URLDecoder.decode(input, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+    	return output;
     }
 
 }
