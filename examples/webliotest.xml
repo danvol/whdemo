@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="league_name">
+		<xpath expression="//div[@class='Cesyj']/span[a/@title='中国語']/following-sibling::node()/@title">
+			<html-to-xml>
+				<http url="http://cjjc.weblio.jp/content/A+algorithm"/>
+			</html-to-xml>
+		</xpath>
+	</var-def>
+</config>

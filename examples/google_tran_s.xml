@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <http method="post" url="http://translate.google.co.jp/translate_a/t?client=g">
+	    <http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0</http-header>
+	    <http-header name="Referer">http://translate.google.co.jp/</http-header>
+	    <http-header name="Accept">application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</http-header>
+        <http-header name="Accept-Language">ja,en-us;q=0.7,en;q=0.3</http-header>
+        <http-header name="Accept-Encoding">deflate</http-header>
+        <http-header name="Cookie">PREF=ID=f17e4bfde7d4615b:U=cf0eb90888a81faa:TM=1363075811:LM=1382957662:S=UfRUQddSrMdD9bQ8; NID=67=JirjwyElMW1FEU4qg4f942s6ZS6hhIWNw41mFox1zxvQZlM4IiIAZeWZz-rlphO5woXUOpAQGs1HqP5s3jtC0mzKRNWoL4LfAdDZCw-vzge-l9OphQvsKJMdh90bvCtL; OGPC=4061029-2:; _ga=GA1.4.23743479.1384941263</http-header>
+        <http-param name="sl">jp</http-param>
+        <http-param name="tl">zh-CN</http-param>
+        <http-param name="hl">ja</http-param>
+        <http-param name="sc">2</http-param>
+        <http-param name="ie">UTF-8</http-param>
+        <http-param name="oe">UTF-8</http-param>
+        <http-param name="rom">1</http-param>
+        <http-param name="prev">btn</http-param>
+        <http-param name="ssel">3</http-param>
+        <http-param name="tsel">4</http-param>
+        <http-param name="q">%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0</http-param>
+    </http>
+</config>

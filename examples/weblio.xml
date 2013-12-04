@@ -1,67 +1,131 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <config>
-	<var-def name="weblio">
-		<html-to-xml>
-			<http method="post" url="http://cjjc.weblio.jp/content/%E3%81%82%E3%81%84%E3%81%8B%E3%82%8F%E3%82%89%E3%81%9A">
-		    </http>
-		</html-to-xml>
-	</var-def>
+    <function name="download-multipage-list">
+        <return>
+            <while condition="${pageUrl.toString().length() != 0}" maxloops="${maxloops}" index="i">
+                <empty>
+                    <var-def name="content">
+                        <html-to-xml>
+                            <http url="${pageUrl}"/>
+                        </html-to-xml>
+                    </var-def>
+
+                    <var-def name="nextLinkUrl">
+                        <xpath expression="${nextXPath}">
+                            <var name="content"/>
+                        </xpath>
+                    </var-def>
+
+                    <var-def name="pageUrl">
+                        <template>${nextLinkUrl}</template>
+                    </var-def>
+                </empty>
+    
+                <xpath expression="${itemXPath}">
+                    <var name="content"/>
+                </xpath>
+            </while>
+        </return>
+    </function>
+
+	<var-def name="startUrl">http://cjjc.weblio.jp/</var-def>
 	
-	<!--白水社 中国語辞典-->
-	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text()">
-		<var name="weblio"></var>
-	</xpath>
-	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'解説')]/following-sibling::node()/text()">
-		<var name="weblio"></var>
-	</xpath>
-	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'解説')]/following-sibling::node()/../text()">
-		<var name="weblio"></var>
-	</xpath>
-    <template>
-	    <![CDATA[]]>
-	            <xquery>
-	                <xq-param name="page" type="node()"><var name="weblio"/></xq-param>
-	                <xq-expression><![CDATA[
-	                        declare variable $page as node() external;
-	
-	                        let $Cgkgj_zh_cn := data($page//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
-	                        let $Edrct_zh_cn := data($page//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
-	                        let $Ncsmy_zh_cn := data($page//div[@class='Ncsmy']/span[text()='中国語訳']/following-sibling::node()/@title)
-	                        let $midashigo := data(($page//h2[@class='midashigo']/@title)[1])
-	                        let $query := data($page//input[@id='combo_txt']/@value)
-	                            return
-	                                <result>
-	                                	<word>{$query}</word>
-	                                	<spell>{$midashigo}</spell>
-	                                	<Cgkgj_zh_cn>{$Cgkgj_zh_cn}</Cgkgj_zh_cn>
-	                                	<Edrct_zh_cn>{$Edrct_zh_cn}</Edrct_zh_cn>
-	                                	<Ncsmy_zh_cn>{$Ncsmy_zh_cn}</Ncsmy_zh_cn>
-	                                	<url>{$url}</url>
-	                                </result>
-	                ]]></xq-expression>
-	            </xquery>
-	    <![CDATA[]]>
-	</template>
-	<!--
-	<xpath expression="//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'解説')]/following-sibling::node()/..[1]/text()">
-		<var name="weblio"></var>
-	</xpath>
-	-->
-	<!--EDR日中対訳辞書-->
-	<xpath expression="//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'読み方')]/../text()">
-		<var name="weblio"></var>
-	</xpath>
-	<xpath expression="//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text()">
-		<var name="weblio"></var>
-	</xpath>
-	
-	<!--日中中日専門用語辞典-->
-	<xpath expression="//div[@class='Ncsmy']/span[@class='ncsmyC']/a[@title='読み方']/..[1]/..[1]/text()/normalize-space()">
-		<var name="weblio"></var>
-	</xpath>
-	<xpath expression="//div[@class='Ncsmy']/span[text()='中国語訳']/following-sibling::node()/@title">
-		<var name="weblio"></var>
-	</xpath>
+	<var-def name="content">
+		<xpath expression="//div[@class='treeBoxC']/p/a/@href">
+			<html-to-xml>
+				<http method="post" url="${startUrl}" />
+			</html-to-xml>
+        </xpath>
+    </var-def>
+    
+	<loop item="aiueoUrl" index="m">
+		<list>
+			<var name="content"></var>
+		</list>
+		<body>
+		    <var-def name="indexUrls">    
+		        <call name="download-multipage-list">
+		            <call-param name="pageUrl"><template>${aiueoUrl}</template></call-param>
+		            <call-param name="nextXPath">(//a[starts-with(., '次へ＞')]/@href)[1]</call-param>
+		            <call-param name="itemXPath">//ul[@class="CtgryUlL" or @class="CtgryUlR"]/li/a/@href</call-param>
+		            <call-param name="maxloops"></call-param>
+		        </call>
+		    </var-def>
+	    	<csv dir="output/weibo/" writeheader="true" delimiter="," charset="UTF-8" filename="weibo_${m}.csv">
+				<loop item="url" index="i">
+					<list>
+						<var name="indexUrls"></var>
+					</list>
+					<body>
+						<empty>
+							<var-def name="page">
+								<html-to-xml>
+									<http method="post" url="${url}">
+								    </http>
+								</html-to-xml>
+							</var-def>
+							<var-def name="yahoopage">
+								<html-to-xml>
+								    <http method="post" url="http://honyaku.yahoo.co.jp/TranslationText?results=1000">
+								    	<http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0</http-header>
+									    <http-header name="Referer">http://honyaku.yahoo.co.jp/</http-header>
+									    <http-header name="Accept">application/json, text/javascript, */*</http-header>
+								        <http-header name="Accept-Language">ja,en-us;q=0.7,en;q=0.3</http-header>
+								        <http-header name="Accept-Encoding">deflate</http-header>
+								        <http-header name="Cookie">B=barhth598ovvl</http-header>
+								        <http-header name="X-Requested-With">XMLHttpRequest</http-header>
+								        <http-header name="Content-Type">application/x-www-form-urlencoded; charset=UTF-8</http-header>
+								        <http-param name="p">%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0</http-param>
+								        <http-param name="ieid">ja</http-param>
+								        <http-param name="oeid">zh</http-param>
+								        <http-param name="formality">0</http-param>
+								        <http-param name="_crumb">xPyQjyMXa4Sn1SvdQW6acwVLv1egCg3P4lxZQVVQr3_XbaZXRrQY1HKPWqNNSALPErGqxGsi728g98ofGCj7iV2b</http-param>
+								        <http-param name="output">json</http-param>
+								        <http-param name="b">3</http-param>
+								        <http-param name="s">9n</http-param>
+								    </http>
+								</html-to-xml>
+							</var-def>
+						</empty>
+					    <template>
+					        <![CDATA[]]>
+					                <xquery>
+					                    <xq-param name="page" type="node()"><var name="page"/></xq-param>
+					                    <xq-param name="yahoopage" type="node()"><var name="yahoopage"/></xq-param>
+					                    <xq-param name="url" type="string"><var name="url"/></xq-param>
+					                    <xq-expression><![CDATA[
+					                            declare variable $page as node() external;
+					                            declare variable $url as xs:string external;
+					 
+					                            let $Cgkgj_zh_cn := data($page//div[@class='Cgkgj']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
+					                            let $Edrct_zh_cn := data($page//div[@class='Edrct']/p[not(.=preceding::p)]/span[contains(text(),'中国語訳')]/..[1]/a[1]/text())
+					                            let $Ncsmy_zh_cn := data($page//div[@class='Ncsmy']/span[text()='中国語訳']/following-sibling::node()/@title)
+					                            let $Wchnt := data($page//div[@class='Wchnt']/span[text()='中国語訳']/following-sibling::node()/@title)
+					                            let $Cesyj := data($page//div[@class='Cesyj']/span[a/@title='中国語']/following-sibling::node()/@title)
+					                            let $midashigo := data(($page//h2[@class='midashigo']/@title)[1])
+					                            let $query := data($page//input[@id='combo_txt']/@value)
+					                            let $yahoodic := data($yahoopage//input[@id='combo_txt']/@value)
+					                                return
+					                                    <result>
+					                                    	<org_word>{$query}</org_word>
+					                                    	<spell>{$midashigo}</spell>
+					                                    	<dic1>{$Cgkgj_zh_cn}</dic1>
+					                                    	<dic2>{$Edrct_zh_cn}</dic2>
+					                                    	<dic3>{$Ncsmy_zh_cn}</dic3>
+					                                    	<dic4>{$Wchnt}</dic4>
+					                                    	<dic5>{$Cesyj}</dic5>
+					                                    	<yahoodic>{$yahoodic}</yahoodic>
+					                                    	<url>{$url}</url>
+					                                    </result>
+					                    ]]></xq-expression>
+					                </xquery>
+					        <![CDATA[]]>
+					    </template>
+					</body>
+				</loop>
+			</csv>
+		</body>
+	</loop>
 
 </config>

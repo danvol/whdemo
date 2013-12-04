@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <http method="post" url="http://honyaku.yahoo.co.jp/TranslationText?results=1000">
+    	<http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko/20100101 Firefox/22.0</http-header>
+	    <http-header name="Referer">http://honyaku.yahoo.co.jp/</http-header>
+	    <http-header name="Accept">application/json, text/javascript, */*</http-header>
+        <http-header name="Accept-Language">ja,en-us;q=0.7,en;q=0.3</http-header>
+        <http-header name="Accept-Encoding">deflate</http-header>
+        <http-header name="Cookie">B=barhth598ovvl</http-header>
+        <http-header name="X-Requested-With">XMLHttpRequest</http-header>
+        <http-header name="Content-Type">application/x-www-form-urlencoded; charset=UTF-8</http-header>
+        <http-param name="p">%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0</http-param>
+        <http-param name="ieid">ja</http-param>
+        <http-param name="oeid">zh</http-param>
+        <http-param name="formality">0</http-param>
+        <http-param name="_crumb">xPyQjyMXa4Sn1SvdQW6acwVLv1egCg3P4lxZQVVQr3_XbaZXRrQY1HKPWqNNSALPErGqxGsi728g98ofGCj7iV2b</http-param>
+        <http-param name="output">json</http-param>
+        <http-param name="b">3</http-param>
+        <http-param name="s">9n</http-param>
+    </http>
+    <!--
+    http://www.crystal-creation.com/web-appli/string/encode-decode/
+    -->
+</config>
