@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="cat0">
+		<html-to-xml>
+			<http method="post" url="http://search.rakuten.co.jp/search/mall/-/A%E3%83%A9%E3%82%A4%E3%83%B3-403834/p.1-s.1-sf.0-st.A-v.2">
+		    </http>
+		</html-to-xml>
+	</var-def>
+	<loop item="catUrl" index="i">
+		<list>
+			<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li/a">
+				<var name="cat0"></var>
+			</xpath>
+			<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li/a/@href">
+				<var name="cat0"></var>
+			</xpath>
+			<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li/a/text()">
+				<var name="cat0"></var>
+			</xpath>
+			<xpath expression="//div[@id='topicPathBox']/ul/li[last()]/a">
+				<var name="cat0"></var>
+			</xpath>
+			<empty>
+				<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li/a/@href">
+					<var name="cat0"></var>
+				</xpath>
+			</empty>
+		</list>
+		<body>
+		</body>
+	</loop>
+</config>

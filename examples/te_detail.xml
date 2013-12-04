@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="cat0">
+			<http method="post" url="http://list.taobao.com/itemlist/shuma.htm">
+		        <http-param name="spm">5221.539771.5825413.383</http-param>
+		        <http-param name="cat">1512</http-param>
+		    	<http-param name="_input_charset">utf-8</http-param>
+		    	<http-param name="json">on</http-param>
+		    </http>
+	</var-def>
+</config>

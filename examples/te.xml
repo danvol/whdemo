@@ -4,26 +4,46 @@
 	<var-def name="cat0">
 		<html-to-xml>
 			<http method="post" url="http://list.taobao.com/browse/cat-0.htm">
+		    	<http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0</http-header>
+			    <http-header name="Accept">text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*</http-header>
+		        <http-header name="Accept-Language">ja,en-us;q=0.7,en</http-header>
+		        <http-header name="Accept-Encoding">deflate</http-header>
+		        <http-header name="Content-Type">application/x-www-form-urlencoded; charset=UTF-8</http-header>
+		        <http-header name="X-Requested-With">XMLHttpRequest</http-header>
 		        <http-param name="spm">0.0.0.0.QOcy3m</http-param>
 		        <http-param name="ad_id"></http-param>
 		    </http>
 		</html-to-xml>
 	</var-def>
-	<loop item="catUrl" index="i">
-		<list>
-			<xpath expression="//div[@class='sublist']/a/@href">
-				<var name="cat0"></var>
-			</xpath>
-			<xpath expression="//h5[@class='subtitle']/a/@href">
-				<var name="cat0"></var>
-			</xpath>
-		</list>
-		<body>
-			<!--
-			<html-to-xml>
-			    <http url="${catUrl}"/>
-			</html-to-xml>
-			-->
-		</body>
-	</loop>
+	
+	<!-- 
+	http://list.taobao.com/itemlist/market/sp.htm?spm=5221.539771.5825413.338&cat=50005700
+	http://list.taobao.com/itemlist/shuma.htm?spm=5221.539771.5825413.383&cat=1512
+	http://list.taobao.com/itemlist/shuma.htm?spm=5221.539771.5825413.404&cat=1101
+	http://list.taobao.com/itemlist/shuma.htm?spm=5221.539771.5825413.415&cat=50047310
+	 -->
+	 
+	<taobaocat dir="output/taobaocat/" writeHeader="true" delimiter="," charset="UTF-8">
+		<loop item="catUrl" index="i">
+			<list>
+				<xpath expression="//h5[@class='subtitle']/a/@href[contains(., 'cat=')]">
+					<var name="cat0"></var>
+				</xpath>
+			</list>
+			<body>
+				<http method="post" url="${catUrl}">
+			    	<http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0</http-header>
+				    <http-header name="Accept">text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*</http-header>
+			        <http-header name="Accept-Language">ja,en-us;q=0.7,en;q=0.3</http-header>
+			        <http-header name="Accept-Encoding">deflate</http-header>
+			        <http-header name="Content-Type">application/x-www-form-urlencoded; charset=UTF-8</http-header>
+			        <http-header name="X-Requested-With">XMLHttpRequest</http-header>
+				    <http-header name="Referer">http://list.taobao.com/itemlist/shuma.htm</http-header>
+			        <http-header name="Cookie">mt=ci%3D0_0; cna=XgtsCkwvIS4CAWq2W2O8vtR+; x=e%3D1%26p%3D*%26s%3D0%26c%3D0%26f%3D0%26g%3D0%26t%3D0; t=4597fa0a4c1c4d0eb8e4b1002f474c95; cookie2=98237eda84e5dc53457f8877281b6748; _tb_token_=5e3e67480038; v=0; uc1=cookie14=UoLU7R1p2f5QRA%3D%3D</http-header>
+			        <http-param name="json">on</http-param>
+			        <http-param name="_input_charset">utf-8</http-param>
+			    </http>
+			</body>
+		</loop>
+	</taobaocat>
 </config>

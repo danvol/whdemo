@@ -59,8 +59,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.stream.StreamResult;
 
@@ -72,14 +70,6 @@ import net.sf.saxon.type.Type;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.webharvest.definition.XmlNode;
 import org.webharvest.definition.XmlParser;
 import org.webharvest.exception.FileException;
@@ -89,7 +79,6 @@ import org.webharvest.runtime.variables.ListVariable;
 import org.webharvest.runtime.variables.NodeVariable;
 import org.webharvest.runtime.variables.Variable;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Basic evaluation utilities
@@ -762,7 +751,7 @@ public class CommonUtil {
         try {
         	XmlNode xmlNode = XmlParser.parse(new InputSource(new ByteArrayInputStream(xmlBody.getBytes(charset))));
         	Map<String, List<String>> resultMap = getXmlDataList(xmlNode, delimiter);
-            // CSVÇ÷èoóÕ
+            // CSVÔøΩ÷èoÔøΩÔøΩ
             writeCsv(fileName, dir + fileName, charset, newLine
             		, StringUtils.join(resultMap.get(XML_TO_CSV_MAP_HEADER_KEY).toArray(), delimiter), resultMap.get(XML_TO_CSV_MAP_LINES_KEY));
         } catch (Exception e) {
@@ -807,6 +796,13 @@ public class CommonUtil {
 	}
     
     public static void writeCsv(String fileName, String fullPath, String charset
+			, String newLine, String headerNames, String line) {
+    	List<String> lst = new ArrayList<String>();
+    	lst.add(line);
+    	writeCsv(fileName, fullPath, charset, newLine, headerNames, lst);
+    }
+    
+    public static void writeCsv(String fileName, String fullPath, String charset
 			, String newLine, String headerNames, List<String> lines) {
     	try {
     		// ensure that target directory exists
@@ -830,4 +826,5 @@ public class CommonUtil {
     		throw new FileException("Error writing data to file: " + fullPath, e);
     	}
 	}
+    
 }

@@ -1,8 +1,5 @@
 package org.webharvest.runtime.processors.plugins;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
-import org.webharvest.exception.FileException;
 import org.webharvest.exception.PluginException;
 import org.webharvest.runtime.Scraper;
 import org.webharvest.runtime.ScraperContext;
@@ -55,10 +51,11 @@ public class TaobaoPlugin extends WebHarvestPlugin {
         			lineValues.add(StringEscapeUtils.escapeCsv(item.getString(key)));
         		}
             	
-            	// CSVÇ÷èoóÕ
+            	// CSV
             	fileName = item.getString("itemId") + ".csv";
             	fullPath = dir + fileName;
-            	writeCsv(fileName, fullPath, delimiter, charset, isWriteHeader, newLine, headerNames, lineValues);
+            	CommonUtil.writeCsv(fileName, fullPath, charset, newLine
+            			, StringUtils.join(headerNames.toArray(), delimiter), StringUtils.join(lineValues.toArray(), delimiter));
             }
 //            return new NodeVariable("");
             return new NodeVariable( "<?xml version=\"1.0\"?>" + "<wrapper>" + XML.toString(itemAry) + "</wrapper>");
@@ -81,26 +78,4 @@ public class TaobaoPlugin extends WebHarvestPlugin {
         return new String[] {"dir", "writeHeader", "delimiter", "charset"};
     }
     
-	private void writeCsv(String fileName, String fullPath, String delimiter, String charset
-			, boolean isWriteHeader, String newLine, List<String> headerNames, List<String> lineValues) {
-    	try {
-    		// ensure that target directory exists
-    		new File( CommonUtil.getDirectoryFromPath(fullPath) ).mkdirs();
-    		
-    		FileOutputStream out = new FileOutputStream(fullPath, false);
-    		byte[] data;
-    		
-    		StringBuilder content = new StringBuilder();
-    		if (isWriteHeader) content.append(StringUtils.join(headerNames.toArray(), delimiter)).append(newLine);
-    		content.append(StringUtils.join(lineValues.toArray(), delimiter));
-    		
-    		data = content.toString().getBytes(charset);
-    		
-    		out.write(data);
-    		out.flush();
-    		out.close();
-    	} catch (IOException e) {
-    		throw new FileException("Error writing data to file: " + fullPath, e);
-    	}
-	}
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="cat0">
+		<html-to-xml>
+			<http method="post" url="http://list.taobao.com/browse/cat-0.htm">
+		        <http-param name="spm">0.0.0.0.QOcy3m</http-param>
+		        <http-param name="ad_id"></http-param>
+		    </http>
+		</html-to-xml>
+	</var-def>
+	<loop item="catUrl" index="i">
+		<list>
+			<xpath expression="(//h5[@class='subtitle']/a/@href[contains(., 'cat=')])[1]">
+				<var name="cat0"></var>
+			</xpath>
+		</list>
+		<body>
+				<http method="post" url="${catUrl}">
+			        <http-param name="json">on</http-param>
+			        <http-param name="_input_charset">utf-8</http-param>
+			    </http>
+		</body>
+	</loop>
+</config>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<var-def name="cat0">
+		<html-to-xml>
+			<http method="post" url="http://directory.rakuten.co.jp/">
+		    </http>
+		</html-to-xml>
+	</var-def>
+	<loop item="catUrl" index="i">
+		<list>
+			<xpath expression="(//a/@href[contains(., 'search.rakuten.co.jp/search/mall')])[1]">
+				<var name="cat0"></var>
+			</xpath>
+		</list>
+		<body>
+			<var-def name="cat1">
+				<html-to-xml>
+					<http method="post" url="${catUrl}">
+				    </http>
+				</html-to-xml>
+			</var-def>
+			<var-def name="cat1-href">
+				<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li/a/@href">
+					<var name="cat1"></var>
+				</xpath>
+			</var-def>
+			<var-def name="cat1-name">
+				<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li/a/text()">
+					<var name="cat1"></var>
+				</xpath>
+			</var-def>
+			<var-def name="cat1-value">
+				<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li/a/@data-genreid">
+					<var name="cat1"></var>
+				</xpath>
+			</var-def>
+			<loop item="catUrlSub1" index="j">
+				<list>
+					<xpath expression="(//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li/a/@href)[1]">
+						<var name="cat1"></var>
+					</xpath>
+				</list>
+				<body>
+					<empty>
+						<var-def name="page">
+							<html-to-xml>
+								<http method="post" url="${catUrlSub1}">
+							    </http>
+							</html-to-xml>
+						</var-def>
+					</empty>
+				    <template>
+				        <![CDATA[]]>
+				                <xquery>
+				                    <xq-param name="page" type="node()"><var name="page"/></xq-param>
+				                    <xq-param name="mainCalHref" type="string"><var name="cat1-href"/></xq-param>
+				                    <xq-param name="mainCalName" type="string"><var name="cat1-name"/></xq-param>
+				                    <xq-param name="mainCalValue" type="string"><var name="cat1-value"/></xq-param>
+				                    <xq-expression><![CDATA[
+				                            declare variable $page as node() external;
+				                            declare variable $mainCalHref as xs:string external;
+				                            declare variable $mainCalName as xs:string external;
+				                            declare variable $mainCalValue as xs:string external;
+				 
+				                            let $ttt := $page//div[@id='topicPathBox']/ul/li[last()]/a
+				                            
+				                            let $m := $page//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li/a
+				                            let $mh := data($m/@href)
+				                            let $mn := data($m)
+				                            let $mv := data($m//@data-genreid)
+				                            let $a := $page//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li
+											for $aa in $a
+				                            let $href := data($aa//@href)
+				                            let $name := data($aa)
+				                            let $value := data($aa//@data-genreid)
+			                                return 
+			                                    <result>
+						                            {$name},{$value},{$href},{$mn},{$mv},{$mh},{$ttt}
+			                                    </result>
+			                                    
+				                    ]]></xq-expression>
+				                </xquery>
+				        <![CDATA[]]>
+				    </template>
+				</body>
+			</loop>
+		</body>
+	</loop>
+</config>
