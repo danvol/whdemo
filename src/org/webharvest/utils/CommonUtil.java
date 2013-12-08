@@ -744,8 +744,8 @@ public class CommonUtil {
         return -1;
     }
     
-    private final static String XML_TO_CSV_MAP_HEADER_KEY = "header";
-    private final static String XML_TO_CSV_MAP_LINES_KEY = "lines";
+    public final static String XML_TO_CSV_MAP_HEADER_KEY = "header";
+    public final static String XML_TO_CSV_MAP_LINES_KEY = "lines";
     public static void resultXmlToCsv(String xmlBody, boolean isWriteHeader, String dir, String fileName, String charset, String delimiter) {
         final String newLine = System.getProperty("line.separator");
         try {
@@ -760,10 +760,13 @@ public class CommonUtil {
     }
     
     public static Map<String, List<String>> getXmlDataList(XmlNode xmlNode, String delimiter) {
+    	Map<String, List<String>> resultMap = new HashMap<String, List<String>>();
+    	if (xmlNode==null) {
+    		return resultMap;
+    	}
     	List<String> headerNames = new ArrayList<String>();
     	List<String> lineValues = new ArrayList<String>();
     	List<String> lines = new ArrayList<String>();
-    	Map<String, List<String>> resultMap = new HashMap<String, List<String>>();
     	Iterator<XmlNode> it = xmlNode.getElementList().iterator();
     	while (it.hasNext()) {
     		XmlNode n = it.next();

@@ -110,6 +110,7 @@ public class DefinitionResolver {
         registerPlugin(JsonToXmlPlugin.class, true);
         registerPlugin(TaobaoPlugin.class, true);
         registerPlugin(TaobaoCatListPlugin.class, true);
+        registerPlugin(RakutenCatListPlugin.class, true);
         registerPlugin(GoogleTranslatePlugin.class, true);
         registerPlugin(CsvPlugin.class, true);
         registerPlugin(XmlToJsonPlugin.class, true);

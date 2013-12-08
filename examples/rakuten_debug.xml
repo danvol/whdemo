@@ -37,7 +37,7 @@
 			</var-def>
 			<loop item="catUrlSub1" index="j">
 				<list>
-					<xpath expression="(//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li/a/@href)[1]">
+					<xpath expression="//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li/a/@href">
 						<var name="cat1"></var>
 					</xpath>
 				</list>

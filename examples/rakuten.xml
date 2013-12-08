@@ -4,10 +4,14 @@
 	<var-def name="cat0">
 		<html-to-xml>
 			<http method="post" url="http://directory.rakuten.co.jp/">
+				<http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0</http-header>
+			    <http-header name="Accept">text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</http-header>
+		        <http-header name="Accept-Language">ja,en-us;q=0.7,en;q=0.3</http-header>
+		        <http-header name="Accept-Encoding">deflate</http-header>
 		    </http>
 		</html-to-xml>
 	</var-def>
-	<csv dir="output/rakuten/" writeheader="true" delimiter="," charset="UTF-8" filename="rakuten.csv">
+	<rakutencat dir="output/rakuten/" writeheader="true" delimiter="," charset="UTF-8" filename="rakuten.csv">
 		<loop item="catUrl" index="i">
 			<list>
 				<xpath expression="//a/@href[contains(., 'search.rakuten.co.jp/search/mall')]">
@@ -19,6 +23,12 @@
 					<var-def name="cat1">
 						<html-to-xml>
 							<http method="post" url="${catUrl}">
+								<http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0</http-header>
+							    <http-header name="Accept">text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</http-header>
+						        <http-header name="Accept-Language">ja,en-us;q=0.7,en;q=0.3</http-header>
+						        <http-header name="Accept-Encoding">deflate</http-header>
+						        <http-header name="Referer">http://directory.rakuten.co.jp/</http-header>
+						        <http-header name="Cookie">Rp=47618e31be568d266c1a4212151e5077974f66</http-header>
 						    </http>
 						</html-to-xml>
 					</var-def>
@@ -49,6 +59,12 @@
 							<var-def name="page">
 								<html-to-xml>
 									<http method="post" url="${catUrlSub1}">
+										<http-header name="User-Agent">Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0</http-header>
+									    <http-header name="Accept">text/html,application/xhtml+xml,application/xml;q=0.9,*/*</http-header>
+								        <http-header name="Accept-Language">ja,en-us;q=0.7,en;q=0.3</http-header>
+								        <http-header name="Accept-Encoding">deflate</http-header>
+								        <http-header name="Referer">http://directory.rakuten.co.jp/</http-header>
+								        <http-header name="Cookie">Rg=1b10b2%26de3d40cdec3d74f784dcb5c514d3a08a9bc9e6faa33e11eb94ad57c9640432e9118799914b0e9bc3f44be2d749e0cef32334d853fc989cdce5f6097412a571fb5059a41bf11fab6e9b0f01e993e3b223de57acbb03dcd8c55690d20d5c840f707cee1bf3e45ea5d69f1cd36554bf16a11318101d07e40cce200d9a25ecd27cc5e3ed5b3db8bb6c6302a3ee08aefa177b%262013-12-04+14%3A35%3A43</http-header>
 								    </http>
 								</html-to-xml>
 							</var-def>
@@ -61,41 +77,46 @@
 					                    <xq-param name="tCalName" type="string"><var name="cat1-name"/></xq-param>
 					                    <xq-param name="tCalValue" type="string"><var name="cat1-value"/></xq-param>
 					                    <xq-expression><![CDATA[
-					                            declare variable $page as node() external;
-					                            declare variable $tCalHref as xs:string external;
-					                            declare variable $tCalName as xs:string external;
-					                            declare variable $tCalValue as xs:string external;
-					                            
-					 				            let $m := $page//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li/a
-					                            let $mh := data($m/@href)
-					                            let $mn := data($m)
-					                            let $mv := data($m//@data-genreid)
-					                            
-					                            let $m1 := $page//link[@rel='canonical']
-					                            let $m1h := data($m1/@href)
-					                            let $m1n := data($page//div[@id='topicPathBox']/h1)
-					                            let $m1v := data(($page//input[@type='hidden' and @name='g'])[1]/@value)
-					                            
-					                            let $a := $page//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']/li[@class='down']/ul/li
-												for $aa in $a
-					                            let $href := data($aa//@href)
-					                            let $name := data($aa)
-					                            let $value := data($aa//@data-genreid)
-				                                return 
-				                                    <result>
-							                            <name>{$name}</name>
-														<value>{$value}</value>
-														<href>{$href}</href>
-														<mid1CalName>{$m1n}</mid1CalName>
-														<mid1CalValue>{$m1v}</mid1CalValue>
-														<mid1CalHref>{$m1h}</mid1CalHref>
-														<mid0CalName>{$mn}</mid0CalName>
-														<mid0CalValue>{$mv}</mid0CalValue>
-														<mid0CalHref>{$mh}</mid0CalHref>
-														<topCalName>{$tCalName}</topCalName>
-														<topCalValue>{$tCalValue}</topCalValue>
-														<topCalHref>{$tCalHref}</topCalHref>
-				                                    </result>
+				                            declare variable $page as node() external;
+				                            declare variable $tCalHref as xs:string external;
+				                            declare variable $tCalName as xs:string external;
+				                            declare variable $tCalValue as xs:string external;
+				                            declare variable $aNormal as node() external;
+				                            declare variable $aDown as node() external;
+				                            
+				 				            let $nav := $page//div[@class='txtInbox']/ul[@class='rsrAsideArrowLi rsrGenreNavigation']
+				 				            
+				                            let $mh := data($nav/li/a/@href)
+				                            let $mn := data($nav/li/a)
+				                            let $mv := data($nav/li/a/@data-genreid)
+				                            
+				                            let $m1 := $page//link[@rel='canonical']
+				                            let $m1h := data($m1/@href)
+				                            let $m1n := data($page//div[@id='topicPathBox']/h1)
+				                            let $m1v := data(($page//input[@type='hidden' and @name='g'])[1]/@value)
+				                            
+				                            let $a := $nav/li[@class='down']/ul/li
+				                            
+											return 
+												<result>
+													<category_name_2>{$m1n}</category_name_2>
+													<category_no_2>{$m1v}</category_no_2>
+													<category_name_1>{$mn}</category_name_1>
+													<category_no_1>{$mv}</category_no_1>
+													<category_name_0>{$tCalName}</category_name_0>
+													<category_no_0>{$tCalValue}</category_no_0>
+												{
+													for $aa in $a
+								                            let $href := data($aa//@href)
+								                            let $name := data($aa)
+								                            let $value := data($aa//@data-genreid)
+							                                	return
+									                                <list>
+												                            <category_name_3>{$name}</category_name_3>
+																			<category_no_3>{$value}</category_no_3>
+									                                </list>			
+												}
+												</result>
 				                                    
 					                    ]]></xq-expression>
 					                </xquery>
@@ -105,5 +126,5 @@
 				</loop>
 			</body>
 		</loop>
-	</csv>
+	</rakutencat>
 </config>
